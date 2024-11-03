@@ -28,9 +28,57 @@ Führen Sie die folgenden Schritte aus, um das Projekt zu installieren:
 
 3. Nach erfolgreicher Installation können Sie das Modul importieren und die Funktion `Download-ChaturbateStream` verwenden, um Chaturbate-Streams herunterzuladen.
 
+
+## Dauerhaft Importieren
+
+Ja, Sie können das Modul dauerhaft importieren, indem Sie es in Ihr PowerShell-Profilskript einfügen. Das PowerShell-Profilskript wird jedes Mal ausgeführt, wenn Sie eine neue PowerShell-Sitzung starten.
+
+### Schritt 1: Öffnen Sie Ihr PowerShell-Profilskript
+
+Öffnen Sie Ihr PowerShell-Profilskript in einem Texteditor. Sie können dies direkt in PowerShell tun:
+
+```powershell
+notepad $PROFILE
+```
+
+Falls das Profilskript noch nicht existiert, wird es durch diesen Befehl erstellt.
+
+### Schritt 2: Fügen Sie den Import-Befehl hinzu
+
+Fügen Sie den folgenden Befehl am Ende Ihres Profilskripts hinzu, um das Modul `ChaturbateDownloader` bei jedem Start von PowerShell zu importieren:
+
+```powershell
+Import-Module "C:\Program Files\WindowsPowerShell\Modules\ChaturbateDownloader\ChaturbateDownloader.psm1"
+```
+
+### Schritt 3: Speichern und schließen Sie das Profilskript
+
+Speichern Sie die Änderungen und schließen Sie den Texteditor.
+
+### Schritt 4: Starten Sie PowerShell neu
+
+Starten Sie PowerShell neu, um sicherzustellen, dass das Modul automatisch importiert wird.
+
+### Beispiel für das Profilskript
+
+Hier ist ein Beispiel, wie Ihr Profilskript aussehen könnte:
+
+```powershell
+# PowerShell-Profilskript
+
+# Andere benutzerdefinierte Einstellungen und Funktionen
+
+# Importiere das ChaturbateDownloader-Modul
+Import-Module "C:\Program Files\WindowsPowerShell\Modules\ChaturbateDownloader\ChaturbateDownloader.psm1"
+```
+
+Durch diese Schritte wird das Modul `ChaturbateDownloader` bei jedem Start von PowerShell automatisch importiert.
+
 ## Verwendung
 
 Nach der Installation können Sie die Funktion `Download-ChaturbateStream` wie folgt verwenden:
 
 ```powershell
 Download-ChaturbateStream -Username "Benutzername"
+
+
