@@ -1,4 +1,4 @@
-function Download-ChaturbateStream {
+function Get-ChaturbateStream {
     param (
         [Parameter(Mandatory=$true)]
         [string]$Username

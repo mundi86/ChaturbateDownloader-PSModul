@@ -39,7 +39,7 @@ Copy-Item -Path "$sourceDir\ChaturbateDownloader.psm1" -Destination $moduleTarge
 Copy-Item -Path "$sourceDir\ChaturbateDownloader.psd1" -Destination $moduleTargetDir -Force
 
 # Kopiere die Plugin-Datei
-Copy-Item -Path "$sourceDir\chaturbate.py" -Destination $pluginTargetDir -Force
+Copy-Item -Path "$sourceDir\source\chaturbate.py" -Destination $pluginTargetDir -Force
 
 # Importiere das Modul
 Import-Module "$moduleTargetDir\ChaturbateDownloader.psm1" -Verbose
