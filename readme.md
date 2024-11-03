@@ -26,7 +26,7 @@ Führen Sie die folgenden Schritte aus, um das Projekt zu installieren:
 
     Das Skript überprüft, ob Streamlink installiert ist und die erforderliche Version hat. Es setzt die Execution Policy auf `RemoteSigned`, erstellt die erforderlichen Verzeichnisse und kopiert die Modul- und Plugin-Dateien an die entsprechenden Orte.
 
-3. Nach erfolgreicher Installation können Sie das Modul importieren und die Funktion `Download-ChaturbateStream` verwenden, um Chaturbate-Streams herunterzuladen.
+3. Nach erfolgreicher Installation können Sie das Modul importieren und die Funktion `Get-ChaturbateStream` verwenden, um Chaturbate-Streams herunterzuladen.
 
 
 ## Dauerhaft Importieren
@@ -76,7 +76,7 @@ Durch diese Schritte wird das Modul `ChaturbateDownloader` bei jedem Start von P
 
 ## Verwendung
 
-Nach der Installation können Sie die Funktion `Download-ChaturbateStream` wie folgt verwenden:
+Nach der Installation können Sie die Funktion `Get-ChaturbateStream` wie folgt verwenden:
 
 ```powershell
 Download-ChaturbateStream -Username "Benutzername"
