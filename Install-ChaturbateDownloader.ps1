@@ -57,9 +57,9 @@ function Write-Fail {
 }
 
 Write-Host ""
-Write-Host "╔══════════════════════════════════════════════════╗" -ForegroundColor Magenta
-Write-Host "║    ChaturbateDownloader  -  Installer v2.0.0     ║" -ForegroundColor Magenta
-Write-Host "╚══════════════════════════════════════════════════╝" -ForegroundColor Magenta
+Write-Host "====================================================" -ForegroundColor Magenta
+Write-Host "   ChaturbateDownloader  -  Installer v2.0.0        " -ForegroundColor Magenta
+Write-Host "====================================================" -ForegroundColor Magenta
 Write-Host ""
 
 # ── Resolve Streamlink ───────────────────────────────────────────────────────
@@ -181,9 +181,9 @@ if ($PSCmdlet.ShouldProcess($moduleFile, 'Import-Module')) {
 }
 
 Write-Host ""
-Write-Host "╔══════════════════════════════════════════════════╗" -ForegroundColor Green
-Write-Host "║           Installation complete! 🎉              ║" -ForegroundColor Green
-Write-Host "╚══════════════════════════════════════════════════╝" -ForegroundColor Green
+Write-Host "====================================================" -ForegroundColor Green
+Write-Host "   Installation complete!                           " -ForegroundColor Green
+Write-Host "====================================================" -ForegroundColor Green
 Write-Host ""
 Write-Host "  Usage example:" -ForegroundColor White
 Write-Host "    Get-ChaturbateStream -Username `"someuser`"" -ForegroundColor Yellow
