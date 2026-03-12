@@ -1,9 +1,9 @@
 @{
-    ModuleVersion     = '2.0.0'
+    ModuleVersion     = '2.0.1'
     GUID              = 'a3f1c2e4-5b67-4d89-a012-bc3def456789'
-    Author            = 'myCode'
-    CompanyName       = 'myCode'
-    Copyright         = '(c) 2024 myCode. MIT License.'
+    Author            = 'mundi'
+    CompanyName       = 'mundi'
+    Copyright         = '(c) 2024-2026 mundi. MIT License.'
     Description       = 'PowerShell module for downloading Chaturbate streams with auto-reconnect and timestamped logging.'
     PowerShellVersion = '5.1'
     FunctionsToExport = @('Get-ChaturbateStream')

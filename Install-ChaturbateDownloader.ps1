@@ -28,8 +28,8 @@
     .\Install-ChaturbateDownloader.ps1 -ModuleDir "C:\MyModules\ChaturbateDownloader"
 
 .NOTES
-    Author  : myCode
-    Version : 2.0.0
+    Author  : mundi
+    Version : 2.0.1
     License : MIT
 #>
 
@@ -58,7 +58,7 @@ function Write-Fail {
 
 Write-Host ""
 Write-Host "====================================================" -ForegroundColor Magenta
-Write-Host "   ChaturbateDownloader  -  Installer v2.0.0        " -ForegroundColor Magenta
+Write-Host "   ChaturbateDownloader  -  Installer v2.0.1        " -ForegroundColor Magenta
 Write-Host "====================================================" -ForegroundColor Magenta
 Write-Host ""
 

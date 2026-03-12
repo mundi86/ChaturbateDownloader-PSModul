@@ -9,8 +9,8 @@
     to both the console (color-coded) and a log file.
 
 .NOTES
-    Author  : myCode
-    Version : 2.0.0
+    Author  : mundi
+    Version : 2.0.1
     License : MIT
 #>
 
@@ -195,7 +195,7 @@ function Get-ChaturbateStream {
 
     $streamUrl = "https://chaturbate.com/$Username/"
 
-    Write-StreamLog "=== ChaturbateDownloader v2.0.0 started ===" -Level INFO -LogFile $LogFile
+    Write-StreamLog "=== ChaturbateDownloader v2.0.1 started ===" -Level INFO -LogFile $LogFile
     Write-StreamLog "Username    : $Username"      -Level INFO -LogFile $LogFile
     Write-StreamLog "URL         : $streamUrl"     -Level INFO -LogFile $LogFile
     Write-StreamLog "Output dir  : $OutputDir"     -Level INFO -LogFile $LogFile

@@ -1,4 +1,4 @@
-# 🎬 ChaturbateDownloader
+# ChaturbateDownloader
 
 > A PowerShell module that records Chaturbate live streams using [Streamlink](https://streamlink.github.io/) — with **automatic reconnect** when a stream drops, color-coded console output, and timestamped log files.
 
@@ -152,7 +152,7 @@ Every event is logged to:
 ### Log format
 
 ```
-[2026-03-12 19:45:23] [INFO]    === ChaturbateDownloader v2.0.0 started ===
+[2026-03-12 19:45:23] [INFO]    === ChaturbateDownloader v2.0.1 started ===
 [2026-03-12 19:45:23] [INFO]    Username    : someuser
 [2026-03-12 19:45:23] [INFO]    Attempt 1 (1/50)
 [2026-03-12 19:45:23] [INFO]    Output file : D:\Recordings\someuser_20260312_194523_seg001.mp4
@@ -179,7 +179,7 @@ ChaturbateDownloader/
 ├── .gitignore                          # Git ignore rules
 ├── LICENSE                             # MIT License
 ├── README.md                           # This file
-├── ChaturbateDownloader.psd1           # PowerShell module manifest (v2.0.0)
+├── ChaturbateDownloader.psd1           # PowerShell module manifest (v2.0.1)
 ├── ChaturbateDownloader.psm1           # Module - Get-ChaturbateStream function
 ├── Install-ChaturbateDownloader.ps1    # Installer script
 └── source/
@@ -238,4 +238,4 @@ Pull requests and issues are welcome. Please follow these steps:
 
 This project is licensed under the **MIT License** — see the [LICENSE](LICENSE) file for details.
 
-© 2024 myCode
+© 2024-2026 mundi
