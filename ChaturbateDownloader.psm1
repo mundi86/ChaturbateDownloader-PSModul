@@ -1,4 +1,4 @@
-#Requires -Version 5.1
+﻿#Requires -Version 5.1
 <#
 .SYNOPSIS
     Downloads Chaturbate streams with automatic reconnect and timestamped logging.
@@ -59,7 +59,7 @@ function Get-ChaturbateStream {
     .DESCRIPTION
         Continuously monitors and records a Chaturbate stream using Streamlink.
         When the stream drops or the connection is interrupted, the function
-        waits for RetryDelay seconds and then attempts to reconnect — up to
+        waits for RetryDelay seconds and then attempts to reconnect â€” up to
         MaxRetries times total.
 
         Each recording segment is saved with a unique timestamp so no data
@@ -125,7 +125,7 @@ function Get-ChaturbateStream {
         [string]$LogFile
     )
 
-    # ── Resolve Streamlink path ──────────────────────────────────────────────
+    # â”€â”€ Resolve Streamlink path â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     if (-not $StreamlinkPath) {
         $candidates = @(
             'C:\Program Files\Streamlink\bin\streamlink.exe',
@@ -145,12 +145,12 @@ function Get-ChaturbateStream {
         return
     }
 
-    # ── Ensure output directory exists ──────────────────────────────────────
+    # â”€â”€ Ensure output directory exists â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     if (-not (Test-Path $OutputDir)) {
         New-Item -ItemType Directory -Path $OutputDir -Force | Out-Null
     }
 
-    # ── Resolve log file path ────────────────────────────────────────────────
+    # â”€â”€ Resolve log file path â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     if (-not $LogFile) {
         $LogFile = Join-Path $OutputDir "$Username`_downloader.log"
     }
@@ -166,7 +166,7 @@ function Get-ChaturbateStream {
     Write-StreamLog "Retry delay : ${RetryDelay}s" -Level INFO -LogFile $LogFile
     Write-StreamLog "Log file    : $LogFile"       -Level INFO -LogFile $LogFile
 
-    # ── Retry loop ───────────────────────────────────────────────────────────
+    # â”€â”€ Retry loop â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     $attempt      = 0
     $successCount = 0
 
@@ -210,7 +210,7 @@ function Get-ChaturbateStream {
             $exitCode = -1
         }
 
-        # ── Post-process check ───────────────────────────────────────────────
+        # â”€â”€ Post-process check â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         $fileOk = $false
         if (Test-Path $outputFile) {
             $fileSize = (Get-Item $outputFile).Length
@@ -227,7 +227,7 @@ function Get-ChaturbateStream {
             }
         }
 
-        # ── Interpret exit code ──────────────────────────────────────────────
+        # â”€â”€ Interpret exit code â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         switch ($exitCode) {
             0 {
                 if ($fileOk) {
@@ -245,18 +245,18 @@ function Get-ChaturbateStream {
             }
         }
 
-        # ── Decide whether to retry ──────────────────────────────────────────
+        # â”€â”€ Decide whether to retry â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         $continueRetrying = $true
 
         if ($exitCode -eq 0 -and $fileOk) {
-            # Normal clean end — still retry in case streamer goes live again
+            # Normal clean end â€” still retry in case streamer goes live again
             Write-StreamLog "Waiting ${RetryDelay}s before checking if stream resumes..." -Level INFO -LogFile $LogFile
         }
         elseif ($exitCode -eq 0 -and -not $fileOk) {
             Write-StreamLog "Stream appears to be offline. Waiting ${RetryDelay}s before retrying..." -Level WARN -LogFile $LogFile
         }
         else {
-            Write-StreamLog "⚠  STREAM DROPPED! Waiting ${RetryDelay}s before reconnecting... (total drops so far: $($attempt - $successCount))" -Level WARN -LogFile $LogFile
+            Write-StreamLog "âš   STREAM DROPPED! Waiting ${RetryDelay}s before reconnecting... (total drops so far: $($attempt - $successCount))" -Level WARN -LogFile $LogFile
         }
 
         if ($MaxRetries -gt 0 -and $attempt -ge $MaxRetries) {
@@ -275,3 +275,4 @@ function Get-ChaturbateStream {
     Write-StreamLog "=== Session complete. Total segments recorded: $successCount ===" -Level SUCCESS -LogFile $LogFile
     Write-StreamLog "Log saved to: $LogFile" -Level INFO -LogFile $LogFile
 }
+
