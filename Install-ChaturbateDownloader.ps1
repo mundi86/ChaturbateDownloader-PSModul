@@ -1,47 +1,193 @@
-# Hinweis zur erforderlichen Streamlink-Version
-Write-Host "Hinweis: Streamlink Version 1.7.0 oder höher ist erforderlich."
+#Requires -Version 5.1
+<#
+.SYNOPSIS
+    Installs the ChaturbateDownloader PowerShell module and Streamlink plugin.
 
-# Überprüfe, ob Streamlink installiert ist und die Version den Anforderungen entspricht
-$streamlinkPath = "C:\Program Files (x86)\Streamlink\bin\streamlink.exe"
-if (-Not (Test-Path -Path $streamlinkPath)) {
-    Write-Host "Streamlink wurde nicht gefunden. Bitte installiere Streamlink Version 1.7.0 oder höher."
+.DESCRIPTION
+    Validates that Streamlink 1.7.0+ is installed, then copies the module
+    files and Python plugin to the correct locations.
+
+    Run this script with Administrator privileges.
+
+.PARAMETER ModuleDir
+    Target directory for the PowerShell module.
+    Defaults to "C:\Program Files\WindowsPowerShell\Modules\ChaturbateDownloader".
+
+.PARAMETER PluginDir
+    Target directory for the Streamlink plugin.
+    Defaults to "C:\Program Files (x86)\Streamlink\pkgs\streamlink\plugins".
+
+.PARAMETER StreamlinkPath
+    Path to streamlink.exe.
+    Auto-detected if not specified.
+
+.EXAMPLE
+    .\Install-ChaturbateDownloader.ps1
+
+.EXAMPLE
+    .\Install-ChaturbateDownloader.ps1 -ModuleDir "C:\MyModules\ChaturbateDownloader"
+
+.NOTES
+    Author  : myCode
+    Version : 2.0.0
+    License : MIT
+#>
+
+[CmdletBinding(SupportsShouldProcess)]
+param (
+    [string]$ModuleDir    = 'C:\Program Files\WindowsPowerShell\Modules\ChaturbateDownloader',
+    [string]$PluginDir    = 'C:\Program Files (x86)\Streamlink\pkgs\streamlink\plugins',
+    [string]$StreamlinkPath
+)
+
+Set-StrictMode -Version Latest
+$ErrorActionPreference = 'Stop'
+
+function Write-Step {
+    param([string]$Msg)
+    Write-Host "  » $Msg" -ForegroundColor Cyan
+}
+function Write-OK {
+    param([string]$Msg)
+    Write-Host "  ✔ $Msg" -ForegroundColor Green
+}
+function Write-Fail {
+    param([string]$Msg)
+    Write-Host "  ✘ $Msg" -ForegroundColor Red
+}
+
+Write-Host ""
+Write-Host "╔══════════════════════════════════════════════════╗" -ForegroundColor Magenta
+Write-Host "║    ChaturbateDownloader  -  Installer v2.0.0     ║" -ForegroundColor Magenta
+Write-Host "╚══════════════════════════════════════════════════╝" -ForegroundColor Magenta
+Write-Host ""
+
+# ── Resolve Streamlink ───────────────────────────────────────────────────────
+Write-Step "Locating streamlink.exe ..."
+
+if (-not $StreamlinkPath) {
+    $candidates = @(
+        'C:\Program Files\Streamlink\bin\streamlink.exe',
+        'C:\Program Files (x86)\Streamlink\bin\streamlink.exe'
+    )
+    foreach ($c in $candidates) {
+        if (Test-Path $c) { $StreamlinkPath = $c; break }
+    }
+    if (-not $StreamlinkPath) {
+        $fromPath = Get-Command streamlink.exe -ErrorAction SilentlyContinue
+        if ($fromPath) { $StreamlinkPath = $fromPath.Source }
+    }
+}
+
+if (-not $StreamlinkPath -or -not (Test-Path $StreamlinkPath)) {
+    Write-Fail "streamlink.exe not found."
+    Write-Host ""
+    Write-Host "  Please install Streamlink 1.7.0 or later from:" -ForegroundColor Yellow
+    Write-Host "  https://streamlink.github.io/install.html" -ForegroundColor Yellow
+    Write-Host ""
     exit 1
 }
 
-# Überprüfe die installierte Streamlink-Version
-$streamlinkVersion = & "$streamlinkPath" --version
-if ($streamlinkVersion -lt "1.7.0") {
-    Write-Host "Installierte Streamlink-Version: $streamlinkVersion. Bitte aktualisiere auf Version 1.7.0 oder höher."
+Write-OK "Found: $StreamlinkPath"
+
+# ── Check Streamlink version ─────────────────────────────────────────────────
+Write-Step "Checking Streamlink version ..."
+
+try {
+    $versionOutput = & "$StreamlinkPath" --version 2>&1
+    # Output looks like: "streamlink 1.7.0" or just "1.7.0"
+    $versionString = ($versionOutput | Select-String -Pattern '(\d+\.\d+\.\d+)').Matches[0].Value
+    $installedVersion = [version]$versionString
+    $requiredVersion  = [version]'1.7.0'
+
+    if ($installedVersion -lt $requiredVersion) {
+        Write-Fail "Streamlink $installedVersion is too old. Version $requiredVersion or newer is required."
+        Write-Host "  Download latest from: https://streamlink.github.io/install.html" -ForegroundColor Yellow
+        exit 1
+    }
+    Write-OK "Streamlink version $installedVersion — OK"
+}
+catch {
+    Write-Fail "Could not determine Streamlink version: $_"
     exit 1
 }
 
-# Setze die Execution Policy auf RemoteSigned
-Set-ExecutionPolicy RemoteSigned -Scope CurrentUser -Force
-
-# Definiere die Zielverzeichnisse
-$moduleTargetDir = "C:\Program Files\WindowsPowerShell\Modules\ChaturbateDownloader"
-$pluginTargetDir = "C:\Program Files (x86)\Streamlink\pkgs\streamlink\plugins"
-
-# Hole das aktuelle Verzeichnis
-$sourceDir = (Get-Location).Path
-
-# Stelle sicher, dass die Zielverzeichnisse existieren
-if (-not (Test-Path -Path $moduleTargetDir)) {
-    New-Item -ItemType Directory -Path $moduleTargetDir -Force
+# ── Set Execution Policy ─────────────────────────────────────────────────────
+Write-Step "Setting Execution Policy to RemoteSigned (CurrentUser) ..."
+try {
+    Set-ExecutionPolicy RemoteSigned -Scope CurrentUser -Force
+    Write-OK "Execution Policy set."
+}
+catch {
+    Write-Fail "Could not set Execution Policy: $_"
+    Write-Host "  You may need to run this in an elevated PowerShell." -ForegroundColor Yellow
 }
 
-if (-not (Test-Path -Path $pluginTargetDir)) {
-    New-Item -ItemType Directory -Path $pluginTargetDir -Force
+# ── Validate source files ────────────────────────────────────────────────────
+Write-Step "Validating source files ..."
+$sourceDir = Split-Path -Parent $MyInvocation.MyCommand.Path
+
+$requiredFiles = @(
+    [PSCustomObject]@{ Path = Join-Path $sourceDir 'ChaturbateDownloader.psm1'; Label = 'Module (.psm1)' }
+    [PSCustomObject]@{ Path = Join-Path $sourceDir 'ChaturbateDownloader.psd1'; Label = 'Manifest (.psd1)' }
+    [PSCustomObject]@{ Path = Join-Path $sourceDir 'source\chaturbate.py';      Label = 'Plugin (chaturbate.py)' }
+)
+
+foreach ($f in $requiredFiles) {
+    if (-not (Test-Path $f.Path)) {
+        Write-Fail "$($f.Label) not found: $($f.Path)"
+        exit 1
+    }
+    Write-OK "$($f.Label) found."
 }
 
-# Kopiere die Moduldateien
-Copy-Item -Path "$sourceDir\ChaturbateDownloader.psm1" -Destination $moduleTargetDir -Force
-Copy-Item -Path "$sourceDir\ChaturbateDownloader.psd1" -Destination $moduleTargetDir -Force
+# ── Create target directories ────────────────────────────────────────────────
+Write-Step "Creating target directories ..."
 
-# Kopiere die Plugin-Datei
-Copy-Item -Path "$sourceDir\source\chaturbate.py" -Destination $pluginTargetDir -Force
+foreach ($dir in @($ModuleDir, $PluginDir)) {
+    if (-not (Test-Path $dir)) {
+        if ($PSCmdlet.ShouldProcess($dir, 'Create directory')) {
+            New-Item -ItemType Directory -Path $dir -Force | Out-Null
+            Write-OK "Created: $dir"
+        }
+    }
+    else {
+        Write-OK "Exists : $dir"
+    }
+}
 
-# Importiere das Modul
-Import-Module "$moduleTargetDir\ChaturbateDownloader.psm1" -Verbose
+# ── Copy files ───────────────────────────────────────────────────────────────
+Write-Step "Copying module files ..."
 
-Write-Host "Installation abgeschlossen. Das Modul ChaturbateDownloader und das Plugin chaturbate.py wurden erfolgreich installiert und importiert."
+$copyOps = @(
+    [PSCustomObject]@{ Src = Join-Path $sourceDir 'ChaturbateDownloader.psm1'; Dst = $ModuleDir }
+    [PSCustomObject]@{ Src = Join-Path $sourceDir 'ChaturbateDownloader.psd1'; Dst = $ModuleDir }
+    [PSCustomObject]@{ Src = Join-Path $sourceDir 'source\chaturbate.py';      Dst = $PluginDir }
+)
+
+foreach ($op in $copyOps) {
+    if ($PSCmdlet.ShouldProcess($op.Src, "Copy to $($op.Dst)")) {
+        Copy-Item -Path $op.Src -Destination $op.Dst -Force
+        Write-OK "Copied: $(Split-Path $op.Src -Leaf) → $($op.Dst)"
+    }
+}
+
+# ── Import module ────────────────────────────────────────────────────────────
+Write-Step "Importing module ..."
+$moduleFile = Join-Path $ModuleDir 'ChaturbateDownloader.psm1'
+if ($PSCmdlet.ShouldProcess($moduleFile, 'Import-Module')) {
+    Import-Module $moduleFile -Force -Verbose:$false
+    Write-OK "Module imported successfully."
+}
+
+Write-Host ""
+Write-Host "╔══════════════════════════════════════════════════╗" -ForegroundColor Green
+Write-Host "║           Installation complete! 🎉              ║" -ForegroundColor Green
+Write-Host "╚══════════════════════════════════════════════════╝" -ForegroundColor Green
+Write-Host ""
+Write-Host "  Usage example:" -ForegroundColor White
+Write-Host "    Get-ChaturbateStream -Username `"someuser`"" -ForegroundColor Yellow
+Write-Host ""
+Write-Host "  With options:" -ForegroundColor White
+Write-Host "    Get-ChaturbateStream -Username `"someuser`" -Quality 720p -MaxRetries 10 -RetryDelay 60" -ForegroundColor Yellow
+Write-Host ""

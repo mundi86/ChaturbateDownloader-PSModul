@@ -1,10 +1,17 @@
 @{
-    ModuleVersion = '1.0.1'
-    GUID = '12345678-1234-1234-1234-123456789012'
-    Author = 'Dein Name'
-    CompanyName = 'myCode'
-    Copyright = '(c) 2023 Dein Name. Alle Rechte vorbehalten.'
-    Description = 'Ein Modul zum Herunterladen von Chaturbate-Streams'
-    FunctionsToExport = @('Get-ChaturbateStream')
+    ModuleVersion     = '2.0.0'
+    GUID              = 'a3f1c2e4-5b67-4d89-a012-bc3def456789'
+    Author            = 'myCode'
+    CompanyName       = 'myCode'
+    Copyright         = '(c) 2024 myCode. MIT License.'
+    Description       = 'PowerShell module for downloading Chaturbate streams with auto-reconnect and timestamped logging.'
     PowerShellVersion = '5.1'
+    FunctionsToExport = @('Get-ChaturbateStream')
+    PrivateData       = @{
+        PSData = @{
+            Tags       = @('Chaturbate', 'Stream', 'Downloader', 'Streamlink', 'Recording')
+            LicenseUri = 'https://github.com/myCode/ChaturbateDownloader/blob/main/LICENSE'
+            ProjectUri = 'https://github.com/myCode/ChaturbateDownloader'
+        }
+    }
 }

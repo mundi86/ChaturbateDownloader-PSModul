@@ -1,0 +1,37 @@
+# Binaries / executables
+*.exe
+*.msi
+*.zip
+*.7z
+
+# Recorded stream output files
+*.mp4
+*.ts
+*.mkv
+*.flv
+
+# Log files
+*.log
+
+# IDE / editor
+.vscode/
+.idea/
+*.code-workspace
+
+# OS artifacts
+Thumbs.db
+Desktop.ini
+.DS_Store
+ehthumbs.db
+
+# PowerShell backup files
+*.psm1.bak
+*.psd1.bak
+
+# Streamlink bundled binary (download separately - see README)
+source/streamlink*.exe
+
+# Temp / build artefacts
+temp/
+tmp/
+plans/
