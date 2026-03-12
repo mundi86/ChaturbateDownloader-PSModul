@@ -35,3 +35,5 @@ source/streamlink*.exe
 temp/
 tmp/
 plans/
+__pycache__/
+*.pyc

@@ -10,8 +10,8 @@
     PrivateData       = @{
         PSData = @{
             Tags       = @('Chaturbate', 'Stream', 'Downloader', 'Streamlink', 'Recording')
-            LicenseUri = 'https://github.com/myCode/ChaturbateDownloader/blob/main/LICENSE'
-            ProjectUri = 'https://github.com/myCode/ChaturbateDownloader'
+            LicenseUri = 'https://github.com/mundi86/ChaturbateDownloader-PSModul/blob/main/LICENSE'
+            ProjectUri = 'https://github.com/mundi86/ChaturbateDownloader-PSModul'
         }
     }
 }

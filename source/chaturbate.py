@@ -1,31 +1,29 @@
 """
-Chaturbate plugin for Streamlink.
-
-Extracts HLS streams from Chaturbate live broadcasts.
-
-Compatible with Streamlink 1.7.0+
+$description Chaturbate live-stream plugin.
+$url chaturbate.com
+$type live
 """
 
-import logging
 import re
 import uuid
 
-from streamlink.plugin import Plugin
-from streamlink.plugin.api import http, validate
-from streamlink.stream import HLSStream
+from streamlink.logger import getLogger
+from streamlink.plugin import Plugin, pluginmatcher
+from streamlink.plugin.api import validate
+from streamlink.stream.hls import HLSStream
 
-log = logging.getLogger(__name__)
+log = getLogger(__name__)
 
 API_HLS = "https://chaturbate.com/get_edge_hls_url_ajax/"
 
-_url_re = re.compile(r"https?://(\w+\.)?chaturbate\.com/(?P<username>\w+)")
+_url_re = re.compile(r"https?://(?:\w+\.)?chaturbate\.com/(?P<username>\w+)/?$")
 
 _post_schema = validate.Schema(
     {
-        "url": validate.text,
-        "room_status": validate.text,
+        "url": validate.any("", validate.url()),
+        "room_status": str,
         "success": int,
-    }
+    },
 )
 
 ROOM_STATUSES = {
@@ -38,20 +36,12 @@ ROOM_STATUSES = {
 }
 
 
+@pluginmatcher(_url_re)
 class Chaturbate(Plugin):
     """Streamlink plugin for Chaturbate."""
 
-    @classmethod
-    def can_handle_url(cls, url):
-        return _url_re.match(url) is not None
-
     def _get_streams(self):
-        match = _url_re.match(self.url)
-        if not match:
-            log.error("Invalid Chaturbate URL: %s", self.url)
-            return
-
-        username = match.group("username")
+        username = self.match.group("username")
         log.info("Fetching stream for user: %s", username)
 
         csrf_token = str(uuid.uuid4().hex.upper()[:32])
@@ -67,11 +57,19 @@ class Chaturbate(Plugin):
             "csrftoken": csrf_token,
         }
 
-        post_data = "room_slug={0}&bandwidth=high".format(username)
+        post_data = {
+            "room_slug": username,
+            "bandwidth": "high",
+        }
 
         try:
-            res  = http.post(API_HLS, headers=headers, cookies=cookies, data=post_data)
-            data = http.json(res, schema=_post_schema)
+            res = self.session.http.post(
+                API_HLS,
+                headers=headers,
+                cookies=cookies,
+                data=post_data,
+            )
+            data = self.session.http.json(res, schema=_post_schema)
         except Exception as exc:
             log.error("Failed to fetch stream data from API: %s", exc)
             return
@@ -104,8 +102,7 @@ class Chaturbate(Plugin):
             if not streams:
                 log.warning("No HLS streams found in playlist for '%s'.", username)
                 return
-            for name, stream in streams.items():
-                yield name, stream
+            yield from streams.items()
         except Exception as exc:
             log.error("Failed to parse HLS playlist: %s", exc)
 

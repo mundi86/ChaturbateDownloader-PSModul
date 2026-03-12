@@ -4,7 +4,7 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![PowerShell 5.1+](https://img.shields.io/badge/PowerShell-5.1%2B-blue.svg)](https://github.com/PowerShell/PowerShell)
-[![Streamlink 1.7+](https://img.shields.io/badge/Streamlink-1.7%2B-orange.svg)](https://streamlink.github.io/)
+[![Streamlink 8.x tested](https://img.shields.io/badge/Streamlink-8.x%20tested-orange.svg)](https://streamlink.github.io/)
 
 --- 
 
@@ -30,9 +30,9 @@ The key feature is **resilience**: if a stream drops or the connection is interr
 | Requirement | Version | Link |
 |-------------|---------|------|
 | PowerShell | 5.1 or newer | [Download](https://github.com/PowerShell/PowerShell/releases) |
-| Streamlink | 1.7.0 or newer | [Download](https://streamlink.github.io/install.html) |
+| Streamlink | 8.x recommended | [Download](https://streamlink.github.io/install.html) |
 
-> ⚠️ The `streamlink-1.7.0.exe` binary is **not** included in this repository to keep it small.  
+> ⚠️ The Streamlink binary is **not** included in this repository to keep it small.  
 > Download Streamlink from the [official website](https://streamlink.github.io/install.html) and install it before running the installer.
 
 ---
@@ -41,7 +41,7 @@ The key feature is **resilience**: if a stream drops or the connection is interr
 
 ### Step 1 — Install Streamlink
 
-Download and install Streamlink 1.7.0 or newer from:  
+Download and install a current Streamlink 8.x release from:  
 👉 https://streamlink.github.io/install.html
 
 ### Step 2 — Run the Installer
@@ -56,7 +56,7 @@ The installer will:
 1. ✅ Verify Streamlink is installed and meets the version requirement
 2. ✅ Set the Execution Policy to `RemoteSigned` for the current user
 3. ✅ Copy the module files to `C:\Program Files\WindowsPowerShell\Modules\ChaturbateDownloader\`
-4. ✅ Copy `chaturbate.py` to the Streamlink plugin directory
+4. ✅ Detect the matching Streamlink plugin directory automatically and copy `chaturbate.py`
 5. ✅ Import the module automatically
 
 #### Custom paths (optional)
@@ -67,6 +67,8 @@ The installer will:
     -PluginDir "C:\CustomStreamlink\plugins" `
     -StreamlinkPath "C:\Tools\streamlink.exe"
 ```
+
+If `-PluginDir` is omitted, the installer derives it from the detected `streamlink.exe` path.
 
 ### Step 3 — (Optional) Permanent Import
 
@@ -115,6 +117,15 @@ Get-ChaturbateStream -Username "someuser" -MaxRetries 0
 Get-ChaturbateStream -Username "someuser" -StreamlinkPath "C:\Tools\streamlink.exe"
 ```
 
+### Custom plugin directory
+
+```powershell
+Get-ChaturbateStream `
+    -Username "someuser" `
+    -StreamlinkPath "C:\Tools\streamlink.exe" `
+    -PluginDir "C:\Program Files\Streamlink\pkgs\streamlink\plugins"
+```
+
 ---
 
 ## ⚙️ Parameters
@@ -127,6 +138,7 @@ Get-ChaturbateStream -Username "someuser" -StreamlinkPath "C:\Tools\streamlink.e
 | `-MaxRetries` | `int` | `50` | Max reconnect attempts (0 = unlimited) |
 | `-RetryDelay` | `int` | `30` | Seconds to wait between retries (5–3600) |
 | `-StreamlinkPath` | `string` | auto-detect | Full path to `streamlink.exe` |
+| `-PluginDir` | `string` | auto-detect | Directory containing `chaturbate.py` for Streamlink |
 | `-LogFile` | `string` | `<OutputDir>\<user>_downloader.log` | Path for the log file |
 
 ---
@@ -187,11 +199,14 @@ Make sure Streamlink is installed. The module searches:
 
 Or pass the path explicitly with `-StreamlinkPath`.
 
+The module also derives the Streamlink plugin directory automatically from the resolved installation path. If needed, override it with `-PluginDir`.
+
 ### ❓ Stream always shows as offline / no file recorded
 
 - Verify the username is correct and the stream is currently live
 - Check the log file for API response details
-- Ensure `chaturbate.py` has been copied to the Streamlink plugin directory (re-run the installer)
+- Re-run the installer so `chaturbate.py` is copied into the correct Streamlink plugin directory
+- If you are running from a checkout, reload the local module with `Import-Module .\ChaturbateDownloader.psm1 -Force`
 
 ### ❓ Execution Policy error
 

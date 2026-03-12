@@ -50,6 +50,38 @@ function Write-StreamLog {
     }
 }
 
+function Resolve-StreamlinkPluginDir {
+    [CmdletBinding()]
+    param (
+        [Parameter(Mandatory = $true)]
+        [string]$StreamlinkPath
+    )
+
+    $candidates = New-Object System.Collections.Generic.List[string]
+
+    $streamlinkBinDir = Split-Path -Parent $StreamlinkPath
+    $streamlinkRoot   = Split-Path -Parent $streamlinkBinDir
+    $moduleRoot       = $PSScriptRoot
+
+    foreach ($candidate in @(
+        (Join-Path $streamlinkRoot 'pkgs\streamlink\plugins'),
+        (Join-Path $moduleRoot 'source'),
+        (Join-Path (Get-Location) 'source')
+    )) {
+        if (-not [string]::IsNullOrWhiteSpace($candidate) -and -not $candidates.Contains($candidate)) {
+            $candidates.Add($candidate)
+        }
+    }
+
+    foreach ($candidate in $candidates) {
+        if (Test-Path (Join-Path $candidate 'chaturbate.py')) {
+            return $candidate
+        }
+    }
+
+    return $null
+}
+
 
 function Get-ChaturbateStream {
     <#
@@ -122,6 +154,8 @@ function Get-ChaturbateStream {
 
         [string]$StreamlinkPath,
 
+        [string]$PluginDir,
+
         [string]$LogFile
     )
 
@@ -145,6 +179,10 @@ function Get-ChaturbateStream {
         return
     }
 
+    if (-not $PluginDir) {
+        $PluginDir = Resolve-StreamlinkPluginDir -StreamlinkPath $StreamlinkPath
+    }
+
     # â”€â”€ Ensure output directory exists â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     if (-not (Test-Path $OutputDir)) {
         New-Item -ItemType Directory -Path $OutputDir -Force | Out-Null
@@ -164,6 +202,7 @@ function Get-ChaturbateStream {
     Write-StreamLog "Quality     : $Quality"       -Level INFO -LogFile $LogFile
     Write-StreamLog "Max retries : $(if ($MaxRetries -eq 0) { 'unlimited' } else { $MaxRetries })" -Level INFO -LogFile $LogFile
     Write-StreamLog "Retry delay : ${RetryDelay}s" -Level INFO -LogFile $LogFile
+    Write-StreamLog "Plugin dir  : $(if ($PluginDir) { $PluginDir } else { '<not found>' })" -Level INFO -LogFile $LogFile
     Write-StreamLog "Log file    : $LogFile"       -Level INFO -LogFile $LogFile
 
     # â”€â”€ Retry loop â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
@@ -194,6 +233,10 @@ function Get-ChaturbateStream {
             '--retry-max', '3',
             '--retry-open', '3'
         )
+
+        if ($PluginDir) {
+            $slArgs = @('--plugin-dirs', $PluginDir) + $slArgs
+        }
 
         try {
             $process = Start-Process `
