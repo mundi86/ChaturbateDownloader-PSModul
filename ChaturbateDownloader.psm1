@@ -239,14 +239,8 @@ function Get-ChaturbateStream {
         }
 
         try {
-            $process = Start-Process `
-                -FilePath $StreamlinkPath `
-                -ArgumentList $slArgs `
-                -NoNewWindow `
-                -PassThru `
-                -Wait
-
-            $exitCode = $process.ExitCode
+            & $StreamlinkPath @slArgs
+            $exitCode = $LASTEXITCODE
         }
         catch {
             Write-StreamLog "Failed to start streamlink process: $_" -Level ERROR -LogFile $LogFile
