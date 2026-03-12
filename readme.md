@@ -6,7 +6,7 @@
 [![PowerShell 5.1+](https://img.shields.io/badge/PowerShell-5.1%2B-blue.svg)](https://github.com/PowerShell/PowerShell)
 [![Streamlink 1.7+](https://img.shields.io/badge/Streamlink-1.7%2B-orange.svg)](https://streamlink.github.io/)
 
----
+--- 
 
 ## 📖 Description
 
